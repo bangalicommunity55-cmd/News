@@ -1,0 +1,308 @@
+<title>The Delta Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700;8..60,800&display=swap">
+<style>
+/* Layout: sticky masthead + category rail, then a three-column front page (lead, briefs, most read) and section blocks below. */
+:root {
+  --bg: #f6f8f7;
+  --surface: #ffffff;
+  --fg: #12201b;
+  --muted: #5a6b64;
+  --line: #d9e2de;
+  --accent: #0b5d4b;
+  --accent-fg: #ffffff;
+  --alert: #c4321c;
+  --soft: #e7f0ec;
+  --font-head: "Source Serif 4", "Noto Serif Bengali", Georgia, serif;
+  --font-bn: "Noto Serif Bengali", "Source Serif 4", Georgia, serif;
+  --font-body: "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1613; --surface: #15211c; --fg: #e6efeb; --muted: #93a69d; --line: #26362f;
+    --accent: #3fc3a1; --accent-fg: #06130f; --alert: #ff6a52; --soft: #1b2b25; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1613; --surface: #15211c; --fg: #e6efeb; --muted: #93a69d; --line: #26362f;
+  --accent: #3fc3a1; --accent-fg: #06130f; --alert: #ff6a52; --soft: #1b2b25; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.55; padding-inline: 16px; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin-inline: auto; }
+
+/* utility bar */
+.util { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: center; padding-block: 8px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); }
+.util .sample { color: var(--alert); font-weight: 600; }
+.util-r { display: flex; gap: 8px; align-items: center; }
+.pill { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 12px; font-size: 13px; }
+.pill:hover { border-color: var(--accent); }
+
+/* masthead */
+.mast { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding-block: 18px 12px; }
+.mast .logo { grid-column: 2; text-align: center; }
+.logo .bn { font-family: var(--font-bn); font-weight: 800; font-size: clamp(30px, 6vw, 56px); line-height: 1.1; letter-spacing: -0.01em; color: var(--accent); display: block; }
+.logo .en { font-family: var(--font-head); font-weight: 700; font-size: 13px; letter-spacing: 0.32em; text-transform: uppercase; color: var(--muted); }
+.search { grid-column: 3; justify-self: end; width: min(100%, 260px); position: relative; }
+.search input { width: 100%; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; }
+.search input::placeholder { color: var(--muted); }
+
+/* category rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-block: 2px solid var(--fg); margin-bottom: 14px; }
+.rail-in { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-block: 6px; }
+.rail-in::-webkit-scrollbar { display: none; }
+.rail a { flex: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 15px; white-space: nowrap; }
+.rail a small { font-family: var(--font-bn); font-weight: 600; font-size: 12px; color: var(--muted); margin-left: 6px; }
+.rail a:hover { background: var(--soft); }
+.rail a[aria-current="page"] { background: var(--accent); color: var(--accent-fg); }
+.rail a[aria-current="page"] small { color: inherit; opacity: 0.85; }
+
+/* ticker */
+.ticker { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 18px; font-size: 14px; min-width: 0; }
+.ticker b { flex: none; background: var(--alert); color: #fff; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+.ticker a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ticker a:hover { text-decoration: underline; }
+
+/* art blocks (placeholder imagery generated from category + id) */
+.art { position: relative; overflow: hidden; border-radius: 6px; aspect-ratio: 16 / 9; max-width: 100%; color: #fff; }
+.art::after { content: attr(data-g); position: absolute; right: 8px; bottom: -14px; font-family: var(--font-bn); font-weight: 800; font-size: 76px; opacity: 0.2; line-height: 1; }
+.art.sm { aspect-ratio: 4 / 3; }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.kicker i { font-style: normal; font-family: var(--font-bn); letter-spacing: 0; margin-left: 6px; color: var(--muted); font-weight: 600; text-transform: none; }
+.meta { font-size: 13px; color: var(--muted); }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; line-height: 1.2; }
+
+/* front page grid */
+.front { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) minmax(0, 0.85fr); gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.lead h2 { font-size: clamp(26px, 3.4vw, 40px); font-weight: 800; margin-block: 10px 8px; }
+.lead p { color: var(--muted); font-size: 17px; margin: 0 0 8px; }
+.lead a:hover h2, .brief a:hover h3 { color: var(--accent); }
+.briefs { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.brief { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.brief:last-child { border: 0; }
+.brief h3 { font-size: 19px; font-weight: 700; margin-block: 4px; }
+.most { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; align-self: start; min-width: 0; }
+.most h2 { font-size: 18px; margin-bottom: 8px; }
+.most ol { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.most li { counter-increment: r; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding-block: 9px; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.35; }
+.most li::before { content: counter(r); font-family: var(--font-head); font-weight: 800; color: var(--accent); font-size: 20px; line-height: 1.1; }
+.most li a:hover { color: var(--accent); }
+.most li .meta { display: block; font-size: 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* sections */
+.sec { padding-block: 22px; border-bottom: 1px solid var(--line); }
+.sec-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-h h2 { font-size: 24px; font-weight: 800; }
+.sec-h h2 i { font-style: normal; font-family: var(--font-bn); font-size: 18px; color: var(--muted); margin-left: 8px; }
+.sec-h a { font-size: 14px; font-weight: 600; color: var(--accent); }
+.sec-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
+.sec-grid .big h3 { font-size: 24px; font-weight: 800; margin-block: 8px 6px; }
+.sec-grid .big p { color: var(--muted); margin: 0; }
+.sec-grid .big a:hover h3, .row a:hover h3 { color: var(--accent); }
+.rows { display: flex; flex-direction: column; min-width: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 14px; padding-block: 12px; border-bottom: 1px solid var(--line); align-items: start; }
+.row:first-child { padding-top: 0; }
+.row:last-child { border: 0; }
+.row h3 { font-size: 18px; font-weight: 700; margin-block: 3px; }
+
+/* list pages */
+.page-h { padding-block: 8px 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: end; }
+.page-h h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; }
+.page-h h1 i { font-style: normal; font-family: var(--font-bn); font-size: 0.6em; color: var(--muted); margin-left: 10px; }
+.sort { display: flex; gap: 6px; }
+.sort button { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: 14px; }
+.sort button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
+.list .row { grid-template-columns: minmax(0, 1fr) 120px; padding-block: 16px; }
+.list .row:first-child { padding-top: 16px; }
+.list .row:last-child { border-bottom: 1px solid var(--line); }
+.list .row p { margin: 0; color: var(--muted); font-size: 15px; }
+.more { display: block; margin: 24px auto; background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 999px; padding: 10px 28px; font-weight: 600; }
+.count { color: var(--muted); font-size: 14px; text-align: center; margin-bottom: 24px; }
+.empty { padding: 40px 0; text-align: center; color: var(--muted); }
+
+/* article */
+.article { max-width: 720px; margin-inline: auto; padding-block: 8px 24px; }
+.article h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; margin-block: 8px 12px; }
+.article .dek { font-size: 20px; color: var(--muted); margin: 0 0 14px; line-height: 1.45; }
+.byline { display: flex; flex-wrap: wrap; gap: 4px 14px; padding-block: 10px; border-block: 1px solid var(--line); font-size: 14px; color: var(--muted); margin-bottom: 18px; }
+.byline b { color: var(--fg); }
+.article .art { margin-bottom: 20px; }
+.article .body p { font-size: 18px; line-height: 1.7; margin: 0 0 16px; max-width: 65ch; }
+.back { display: inline-block; margin-bottom: 8px; color: var(--accent); font-weight: 600; font-size: 14px; }
+.notice { background: var(--soft); border-radius: 6px; padding: 10px 14px; font-size: 14px; color: var(--muted); margin-top: 20px; }
+.related { max-width: 720px; margin-inline: auto; padding-block: 8px 24px; }
+.related h2 { font-size: 20px; margin-bottom: 10px; }
+.related .row { grid-template-columns: minmax(0, 1fr); padding-block: 10px; }
+.related .row:first-child { padding-top: 10px; }
+
+footer { margin-top: 28px; padding-block: 22px 40px; border-top: 2px solid var(--fg); display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
+footer .bn { font-family: var(--font-bn); font-weight: 800; font-size: 22px; color: var(--accent); }
+
+@media (max-width: 900px) {
+  .front { grid-template-columns: minmax(0, 1fr); }
+  .sec-grid { grid-template-columns: minmax(0, 1fr); }
+  .list { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .mast { grid-template-columns: 1fr; }
+  .mast .logo, .search { grid-column: 1; justify-self: stretch; width: 100%; }
+  .row { grid-template-columns: minmax(0, 1fr) 84px; }
+  .list .row { grid-template-columns: minmax(0, 1fr) 96px; }
+}
+@media (prefers-reduced-motion: no-preference) { .rail a, .pill { transition: background 0.15s, border-color 0.15s; } }
+</style>
+
+<div class="wrap">
+  <div class="util">
+    <span id="today"></span>
+    <span class="sample">Headlines summarised from The Daily Star, 12 Oct 2026</span>
+    <div class="util-r"><button class="pill" id="theme" type="button" aria-label="Switch colour theme">Theme</button></div>
+  </div>
+  <header class="mast">
+    <a class="logo" href="#" aria-label="The Delta Daily, home">
+      <span class="bn">ডেল্টা ডেইলি</span>
+      <span class="en">The Delta Daily</span>
+    </a>
+    <div class="search"><input id="q" type="search" placeholder="Search headlines" autocomplete="off" aria-label="Search stories"></div>
+  </header>
+  <nav class="rail" aria-label="Sections"><div class="rail-in" id="rail"></div></nav>
+  <main id="app"></main>
+  <footer>
+    <span class="bn">ডেল্টা ডেইলি</span>
+    <span>The Delta Daily is a news digest. Each item is a short summary written in our own words, based on the headline of a report in The Daily Star, with a link to the full story. All reporting belongs to The Daily Star. Summaries do not replace the original, so read the source for details.</span>
+  </footer>
+</div>
+
+<script>
+const ARTICLES = [{"c":"national","t":"2026-10-11","h":"Munshiganj water plant stands unused after delays and disputes","d":"A water plant in Munshiganj has not come into use because of project delays and disagreements, the Daily Star reports.","s":"The Daily Star","u":"https://www.thedailystar.net/news/news/delays-disagreements-leave-munshiganj-water-plant-unused-4295856","id":1,"n":0},{"c":"national","t":"2026-10-11","h":"Youth beaten to death over theft allegation","d":"A young man was beaten to death after being accused of theft, according to the Daily Star's crime and justice desk.","s":"The Daily Star","u":"https://www.thedailystar.net/news/crime-justice/news/youth-beaten-death-over-theft-allegation-4295566","id":2,"n":10},{"c":"national","t":"2026-10-11","h":"Culvert repair still unfinished after six months","d":"Work on a culvert has not been completed six months after it began, the report says.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/six-months-culvert-work-still-unfinished-4295666","id":3,"n":20},{"c":"national","t":"2026-10-11","h":"Commentary revisits Abul Hashim's case for inclusive politics","d":"The piece argues that Abul Hashim's approach to inclusion in politics is still relevant today.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/abul-hashims-politics-inclusion-still-relevant-4295576","id":4,"n":30},{"c":"national","t":"2026-10-11","h":"Toufique Imrose Khalidi laid to rest amid tributes","d":"Mourners paid tribute at the burial of Toufique Imrose Khalidi on 11 October.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/toufique-imrose-khalidi-laid-rest-amid-tributes-4295581","id":5,"n":40},{"c":"national","t":"2026-10-11","h":"Parliamentary committee questions 4,000MW solar target","d":"A Jatiya Sangsad committee raised questions about the government's goal of 4,000 megawatts of solar power.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/js-body-questions-4000mw-solar-power-target-4295591","id":6,"n":50},{"c":"national","t":"2026-10-11","h":"Prime minister likely to visit Japan on 26 October","d":"The Daily Star reports that the prime minister is expected to travel to Japan on 26 October.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/pm-likely-visit-japan-oct-26-4295601","id":7,"n":60},{"c":"national","t":"2026-10-11","h":"Radda health centre rebuilt from ruins","d":"A health centre in Radda is being brought back into service after being left in ruins.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/radda-health-centre-rises-ruins-4295606","id":8,"n":70},{"c":"national","t":"2026-10-11","h":"Government plans AI-based reviews of officials' performance","d":"An AI-driven system for assessing the performance of government officials is in the works.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/news/govt-officials-performance-ai-driven-review-the-works-4295611","id":9,"n":80},{"c":"international","t":"2026-10-12","h":"North Korea fires several ballistic missiles toward the Sea of Japan","d":"The launch was reported on 12 October. Follow the source for official statements and reactions.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/north-korea-fires-several-ballistic-missiles-sea-japan-4296621","id":10,"n":1},{"c":"international","t":"2026-10-12","h":"Trump announces energy ceasefire between Ukraine and Russia","d":"The announcement reportedly surprised Ukrainian President Zelenskiy, according to the report.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/trump-announces-ukraine-energy-ceasefire-russia-surprising-zelenskiy-4296601","id":11,"n":11},{"c":"international","t":"2026-10-12","h":"Why Saudi air defences are struggling against Houthi attacks","d":"An explainer on the difficulties Saudi Arabia faces in stopping Houthi strikes.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/why-are-saudi-defences-struggling-rebuff-houthi-attacks-4296581","id":12,"n":21},{"c":"international","t":"2026-10-12","h":"One killed in new attack on Saudi airport a day after Houthi strike left 13 dead","d":"An updated report on fresh attacks on an airport in Saudi Arabia.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/one-dead-new-attack-saudi-airport-day-after-houthi-strike-kills-13-4296576","id":13,"n":31},{"c":"international","t":"2026-10-12","h":"Riyadh airport hit by another Houthi strike","d":"A new strike on Riyadh's airport was reported on 12 October.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/middle-east/news/riyadh-airport-hit-fresh-houthi-strike-4296501","id":14,"n":41},{"c":"international","t":"2026-10-12","h":"Two Bangladeshis killed in Riyadh airport strike","d":"Two Bangladeshi nationals were among those killed in the attack on the airport.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/middle-east/news/2-bangladeshis-killed-riyadh-airport-strike-4296506","id":15,"n":51},{"c":"international","t":"2026-10-11","h":"Bangladesh condemns Houthi attack on Riyadh airport","d":"Dhaka condemned the strike that killed two Bangladeshi nationals.","s":"The Daily Star","u":"https://www.thedailystar.net/news/bangladesh/diplomacy/news/bangladesh-condemns-houthi-attack-riyadh-airport-killed-two-nationals-4295831","id":16,"n":61},{"c":"international","t":"2026-10-12","h":"Visa deadline pressure builds for workers bound for Saudi Arabia","d":"The report looks at the time limit facing Bangladeshi workers preparing to travel to Saudi Arabia.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/middle-east/news/visa-clock-ticks-ksa-bound-workers-4296511","id":17,"n":71},{"c":"international","t":"2026-10-12","h":"Last Ceuta migrant camp cleared before Spanish king's visit","d":"Authorities removed the last migrant camp in Ceuta ahead of the visit.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/last-ceuta-migrant-camp-removed-ahead-spanish-kings-visit-4296491","id":18,"n":81},{"c":"international","t":"2026-10-12","h":"Iran executes man convicted of killing a police officer","d":"Iran carried out the execution of a man over the killing of a police officer.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/middle-east/news/iran-executes-man-killing-police-officer-4296496","id":19,"n":91},{"c":"international","t":"2026-10-12","h":"Pakistan declares emergency in Khyber Pakhtunkhwa amid PTI protests","d":"The emergency follows anti-government protests led by PTI.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/south-asia/news/anti-govt-protests-pti-pakistan-imposes-emergency-kp-4296526","id":20,"n":101},{"c":"international","t":"2026-10-12","h":"Protests against India's election chief continue over voter list row","d":"Demonstrations continue over a dispute about India's voter lists.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/india/news/indian-voter-list-row-protests-against-polls-chief-continue-4296531","id":21,"n":111},{"c":"international","t":"2026-10-12","h":"Nepal asks villagers to evacuate","d":"Nepali authorities urged villagers to leave their homes. The source has the details.","s":"The Daily Star","u":"https://www.thedailystar.net/news/world/news/nepal-urges-villagers-evacuate-4296441","id":22,"n":121},{"c":"business","t":"2026-10-12","h":"Foreign debt rises to $114.98 billion","d":"Bangladesh's external debt has climbed to $114.98 billion, the report says.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/foreign-debt-rises-11498b-4296366","id":23,"n":3},{"c":"business","t":"2026-10-12","h":"Marubeni looks at new investments in Bangladesh","d":"The Japanese trading company is exploring fresh investment opportunities.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/marubeni-eyes-new-investments-bangladesh-4296356","id":24,"n":13},{"c":"business","t":"2026-10-12","h":"Weak LPG monitoring leaves consumers paying more","d":"The report says lax oversight of the LPG market is costing consumers.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/consumers-paying-the-price-lax-lpg-monitoring-4296381","id":25,"n":23},{"c":"business","t":"2026-10-12","h":"Net foreign direct investment falls 28% in first half of 2026","d":"Net FDI inflows dropped by 28 percent in January to June.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/net-fdi-inflows-drop-28-first-half-2026-4296376","id":26,"n":33},{"c":"business","t":"2026-10-12","h":"Walton plans to expand in Kenya","d":"The Bangladeshi electronics maker is looking to grow its presence in Kenya.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/walton-expand-kenya-4296371","id":27,"n":43},{"c":"business","t":"2026-10-12","h":"BTRC sets base price for lower-band spectrum","d":"The telecom regulator has fixed a base price for lower-band spectrum.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/btrc-sets-base-price-lower-band-spectrum-4296351","id":28,"n":53},{"c":"business","t":"2026-10-12","h":"US manufacturers feel the sting of trade wars before midterms","d":"American manufacturers are under pressure from tariffs ahead of the midterm elections.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/trumps-trade-wars-sting-us-manufacturers-ahead-midterm-elections-4296341","id":29,"n":63},{"c":"business","t":"2026-10-12","h":"Opinion: airline business and aircraft procurement","d":"A commentary on how airlines run their business and buy aircraft.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/airlines-business-and-procurement-aircraft-4296336","id":30,"n":73},{"c":"business","t":"2026-10-12","h":"Gold rises to a one-week high","d":"Gold prices climbed to their highest level in a week.","s":"The Daily Star","u":"https://www.thedailystar.net/business/global-economy/news/gold-hits-one-week-high-4296326","id":31,"n":83},{"c":"business","t":"2026-10-12","h":"US consumer sentiment slips as cost worries grow","d":"A survey shows American consumers are more worried about costs.","s":"The Daily Star","u":"https://www.thedailystar.net/business/global-economy/news/us-consumer-sentiment-dips-cost-worries-mount-survey-4296301","id":32,"n":93},{"c":"business","t":"2026-10-12","h":"Government and European bank to invest €250 million in women's healthcare","d":"The planned investment targets women's healthcare in Bangladesh.","s":"The Daily Star","u":"https://www.thedailystar.net/business/organisation-news/news/govt-european-bank-invest-eu250m-womens-healthcare-4296296","id":33,"n":103},{"c":"business","t":"2026-10-12","h":"Olympic recommends 35% dividend","d":"The company's board has recommended a 35 percent dividend for shareholders.","s":"The Daily Star","u":"https://www.thedailystar.net/business/economy/news/olympic-recommends-35-dividend-4296266","id":34,"n":113},{"c":"entertainment","t":"2026-10-12","h":"Actor Nasima Khan dies","d":"The Daily Star reports the death of actor Nasima Khan and the concern she left over her missing son.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/actor-nasima-khan-passes-away-leaving-behind-anguish-over-missing-son-4296641","id":35,"n":4},{"c":"entertainment","t":"2026-10-12","h":"Profile: Mehazabien Chowdhury's winning journey","d":"A look at the path of actor Mehazabien Chowdhury beyond her recent award.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/beyond-the-award-mehazabien-chowdhurys-winning-journey-4296636","id":36,"n":14},{"c":"entertainment","t":"2026-10-11","h":"Three Dhallywood films set for Durga Puja release","d":"Three Bangladeshi films are scheduled to open during the Durga Puja holidays.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/three-dhallywood-films-set-durga-puja-release-4296101","id":37,"n":24},{"c":"entertainment","t":"2026-10-11","h":"Salman Khan launches YouTube channel with acting lessons","d":"The Bollywood actor is sharing acting lessons for fans on a new channel.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/salman-khan-launches-youtube-channel-acting-lessons-fans-4296081","id":38,"n":34},{"c":"entertainment","t":"2026-10-11","h":"Tanjin Tisha escapes serious road accident","d":"The actor survived a major road accident, according to the report.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/tanjin-tisha-escapes-major-road-accident-4295801","id":39,"n":44},{"c":"entertainment","t":"2026-10-11","h":"How Nana Patekar turned a monologue into cultural memory","d":"A feature on the actor's famous monologue and its lasting place in popular culture.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/how-nana-patekar-turned-monologue-cultural-memory-4295826","id":40,"n":54},{"c":"entertainment","t":"2026-10-11","h":"Ishaan returns with new song 'Dhoop'","d":"Musician Ishaan has released a new song titled 'Dhoop'.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/ishaan-returns-new-song-dhoop-4295791","id":41,"n":64},{"c":"entertainment","t":"2026-10-11","h":"Vicky Zahed says he is only getting started after three wins","d":"The actor says his recent wins are the start of his career, not the peak.","s":"The Daily Star","u":"https://www.thedailystar.net/culture/entertainment/news/three-wins-later-vicky-zahed-says-hes-only-getting-started-4295586","id":42,"n":74},{"c":"sports","t":"2026-10-12","h":"Why Manchester City fans brought inflatable bananas to Anfield","d":"An explainer on the fans' stunt at Liverpool's ground.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/football/news/why-manchester-city-fans-brought-inflatable-bananas-anfield-4296646","id":43,"n":2},{"c":"sports","t":"2026-10-12","h":"Farhan celebrates first series win as captain","d":"He says 200 is the new benchmark in the format after the series victory.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/cricket/news/200-the-new-benchmark-farhan-celebrates-first-series-win-captain-4296626","id":44,"n":12},{"c":"sports","t":"2026-10-12","h":"Hasan's dominance continues with tight length control","d":"A cricket analysis of the bowler's accuracy and control of length.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/cricket/news/hasans-domination-continues-immaculate-length-management-4296611","id":45,"n":22},{"c":"sports","t":"2026-10-12","h":"Premier League talking points: City roar, United at a 40-year low, Guimaraes rescues Arsenal","d":"A round-up of the weekend's main stories in English football.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/football/news/pl-talking-points-city-roar-united-hit-40-year-low-guimaraes-rescues-arsenal-4296606","id":46,"n":32},{"c":"sports","t":"2026-10-12","h":"Smith breaks fielding record as Australia take control of Durban Test","d":"Steve Smith set a fielding record while Australia gained the upper hand in the Test.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/cricket/news/smith-breaks-fielding-record-australia-take-control-durban-test-4296586","id":47,"n":42},{"c":"sports","t":"2026-10-12","h":"Maresca says City must win games and make their own noise","d":"The manager spoke about what his team needs to do after a big match.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/football/news/we-need-make-our-own-noise-maresca-says-city-must-win-games-4296571","id":48,"n":52},{"c":"sports","t":"2026-10-12","h":"Pakistan post record home total to seal T20I series against Sri Lanka","d":"Pakistan clinched the series with their highest total on home soil.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/cricket/news/pakistan-smash-record-home-total-seal-sri-lanka-t20i-series-4296566","id":49,"n":62},{"c":"sports","t":"2026-10-12","h":"India hold off West Indies in third T20I to lead series 2-1","d":"India won a close match to go ahead in the series.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/cricket/news/india-hold-west-indies-third-t20i-take-2-1-series-lead-4296481","id":50,"n":72},{"c":"sports","t":"2026-10-12","h":"Sports writers protest cancellation of women's football match","d":"The BSWA objected to the cancellation of a women's football fixture.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/football/news/bswa-protests-cancellation-womens-football-match-4296471","id":51,"n":82},{"c":"sports","t":"2026-10-12","h":"What to watch on TV today, 12 October","d":"The day's sports broadcast schedule.","s":"The Daily Star","u":"https://www.thedailystar.net/sports/more-sports/news/what-watch-tv-today-12-oct-2026-4296591","id":52,"n":92}];
+const CATS = [
+  ["national","National","জাতীয়",155],["international","World","আন্তর্জাতিক",205],["sports","Sports","খেলা",25],
+  ["business","Business","অর্থনীতি",45],["entertainment","Entertainment","বিনোদন",320]
+];
+const CAT = Object.fromEntries(CATS.map(c => [c[0], {id:c[0], en:c[1], bn:c[2], hue:c[3]}]));
+const BYID = new Map(ARTICLES.map(a => [a.id, a]));
+const app = document.getElementById("app");
+const rail = document.getElementById("rail");
+const qEl = document.getElementById("q");
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtDate = t => new Date(t + "T12:00:00").toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric"});
+const fmtShort = t => new Date(t + "T12:00:00").toLocaleDateString("en-GB", {day:"numeric", month:"short"});
+const byN = (a, b) => a.n - b.n;
+
+function art(a, cls) {
+  const c = CAT[a.c], h = c.hue, h2 = (h + 28 + (a.id * 37) % 40) % 360, ang = (a.id * 53) % 180;
+  const st = `background:repeating-linear-gradient(${ang}deg, rgba(255,255,255,0.07) 0 10px, rgba(255,255,255,0) 10px 22px), linear-gradient(${ang + 20}deg, hsl(${h} 48% 24%), hsl(${h2} 52% 38%))`;
+  return `<div class="art ${cls || ""}" data-g="${esc(c.bn.charAt(0))}" style="${st}" role="img" aria-label="Section graphic, ${esc(c.en)}"></div>`;
+}
+const kick = a => `<span class="kicker">${esc(CAT[a.c].en)}<i>${esc(CAT[a.c].bn)}</i></span>`;
+const link = a => `#a${a.id}`;
+const meta = a => `${fmtShort(a.t)} · ${esc(a.s)}`;
+
+function row(a, withDek) {
+  return `<div class="row"><a href="${link(a)}"><div>${kick(a)}<h3>${esc(a.h)}</h3>${withDek ? `<p>${esc(a.d)}</p>` : ""}<span class="meta">${meta(a)}</span></div></a><a href="${link(a)}" tabindex="-1" aria-hidden="true">${art(a, "sm")}</a></div>`;
+}
+
+function renderRail(cur) {
+  rail.innerHTML = `<a href="#" ${cur === "home" ? 'aria-current="page"' : ""}>Home<small>প্রথম পাতা</small></a>` +
+    CATS.map(c => `<a href="#${c[0]}" ${cur === c[0] ? 'aria-current="page"' : ""}>${c[1]}<small>${c[2]}</small></a>`).join("");
+}
+
+function home() {
+  const sorted = ARTICLES.slice().sort(byN);
+  const first = c => sorted.find(a => a.c === c);
+  const lead = first("national");
+  const ticker = first("international");
+  const used = new Set([lead.id]);
+  const briefs = [];
+  for (const c of ["international", "business", "sports", "entertainment"]) {
+    const a = sorted.filter(x => x.c === c)[1]; used.add(a.id); briefs.push(a);
+  }
+  const latest = sorted.filter(a => !used.has(a.id)).slice(0, 8);
+  let html = `<div class="ticker"><b>Latest</b><a href="${link(ticker)}">${esc(ticker.h)}</a></div>`;
+  html += `<section class="front" aria-label="Top stories">
+    <div class="lead"><a href="${link(lead)}">${art(lead)}<div style="margin-top:12px">${kick(lead)}</div><h2>${esc(lead.h)}</h2><p>${esc(lead.d)}</p><span class="meta">${meta(lead)}</span></a></div>
+    <div class="briefs">${briefs.map(a => `<div class="brief"><a href="${link(a)}">${kick(a)}<h3>${esc(a.h)}</h3><span class="meta">${meta(a)}</span></a></div>`).join("")}</div>
+    <aside class="most" aria-label="More headlines"><h2>More headlines</h2><ol>${latest.map(a => `<li><a href="${link(a)}">${esc(a.h)}<span class="meta">${esc(CAT[a.c].en)} · ${fmtShort(a.t)}</span></a></li>`).join("")}</ol></aside>
+  </section>`;
+  for (const c of CATS) {
+    const list = sorted.filter(a => a.c === c[0] && !used.has(a.id)).slice(0, 5);
+    if (!list.length) continue;
+    const [big, ...rest] = list;
+    html += `<section class="sec"><div class="sec-h"><h2>${c[1]}<i>${c[2]}</i></h2><a href="#${c[0]}">All ${c[1].toLowerCase()} headlines →</a></div>
+      <div class="sec-grid"><div class="big"><a href="${link(big)}">${art(big)}<h3>${esc(big.h)}</h3><p>${esc(big.d)}</p><span class="meta">${meta(big)}</span></a></div>
+      <div class="rows">${rest.map(a => row(a)).join("")}</div></div></section>`;
+  }
+  app.innerHTML = html;
+  document.title = "The Delta Daily";
+}
+
+function listPage(title, bn, items) {
+  const sorted = items.slice().sort(byN);
+  app.innerHTML = `<div class="page-h"><h1>${esc(title)}${bn ? `<i>${esc(bn)}</i>` : ""}</h1></div>
+    ${sorted.length ? `<div class="list">${sorted.map(a => row(a, true)).join("")}</div><div class="count">${sorted.length} headlines</div>` : `<div class="empty">No headlines match that search. Try a name, a place, or a topic such as cricket or Saudi.</div>`}`;
+}
+
+function section(id) {
+  const c = CAT[id];
+  listPage(c.en, c.bn, ARTICLES.filter(a => a.c === id));
+  document.title = c.en + " | The Delta Daily";
+}
+
+function search(q) {
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const items = ARTICLES.filter(a => { const s = (a.h + " " + a.d).toLowerCase(); return words.every(w => s.includes(w)); });
+  listPage(`Search: ${q}`, "", items);
+  document.title = "Search | The Delta Daily";
+}
+
+function article(id) {
+  const a = BYID.get(id);
+  if (!a) { app.innerHTML = `<div class="empty">That story could not be found. <a href="#" style="color:var(--accent)">Back to the front page</a></div>`; return; }
+  const rel = ARTICLES.filter(x => x.c === a.c && x.id !== a.id).sort(byN).slice(0, 5);
+  app.innerHTML = `<article class="article">
+    <a class="back" href="#${a.c}">← ${esc(CAT[a.c].en)}</a>
+    <div>${kick(a)}</div>
+    <h1>${esc(a.h)}</h1>
+    <p class="dek">${esc(a.d)}</p>
+    <div class="byline"><span>Source: <b>${esc(a.s)}</b></span><span>${fmtDate(a.t)}</span></div>
+    ${art(a)}
+    <a class="more" style="display:inline-block;margin:0 0 8px" href="${esc(a.u)}" target="_blank" rel="noopener noreferrer">Read the full story at ${esc(a.s)} →</a>
+    <div class="notice">This is a short summary written in our own words from the headline of the original report. It may leave out important details, so read the source for the full story.</div>
+  </article>
+  <section class="related"><h2>More from ${esc(CAT[a.c].en)}</h2>${rel.map(r => row(r)).join("")}</section>`;
+  document.title = a.h + " | The Delta Daily";
+}
+
+function route() {
+  const h = decodeURIComponent(location.hash.replace(/^#/, ""));
+  if (/^a\d+$/.test(h)) { const a = BYID.get(+h.slice(1)); renderRail(a ? a.c : "home"); article(+h.slice(1)); }
+  else if (CAT[h]) { renderRail(h); section(h); }
+  else { renderRail("home"); home(); }
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+let t;
+qEl.addEventListener("input", () => {
+  clearTimeout(t);
+  t = setTimeout(() => {
+    const q = qEl.value.trim();
+    if (q.length >= 2) { renderRail(""); search(q); }
+    else if (q.length === 0) route();
+  }, 200);
+});
+
+document.getElementById("today").textContent = "Monday, 12 October 2026 · Dhaka edition";
+document.getElementById("theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+});
+
+route();
+</script>
